@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 
 // Замените 'repo-name' на НАЗВАНИЕ вашего репозитория на GitHub!
-const repoName = "bootstrap-vite";
+const repoName = "vite-bootstrap";
 
 export default defineConfig({
   base: `/${repoName}/`,
