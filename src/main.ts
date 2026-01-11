@@ -1,3 +1,4 @@
+import "./styles.scss";
 import { DateTime } from "luxon";
 
 const FORMAT = "dd.LL.y HH:mm:ss";
