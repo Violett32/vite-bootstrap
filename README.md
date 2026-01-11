@@ -1,0 +1,537 @@
+# Vite Bootstrap - Пошаговое объяснение проекта
+
+## 📋 Содержание
+
+1. [Обзор проекта](#обзор-проекта)
+2. [Структура проекта](#структура-проекта)
+3. [Как работает проект](#как-работает-проект)
+4. [Установка и запуск](#установка-и-запуск)
+5. [Сборка и деплой](#сборка-и-деплой)
+
+---
+
+## 🎯 Обзор проекта
+
+Это простое веб-приложение, которое показывает текущее время в модальном окне. Проект построен с использованием современных технологий:
+
+- **Vite** - быстрый сборщик и сервер разработки
+- **TypeScript** - типизированный JavaScript для надежности кода
+- **Bootstrap 5** - CSS-фреймворк для стилизации
+- **Luxon** - библиотека для работы с датами и временем
+- **SCSS** - препроцессор CSS для удобного написания стилей
+
+---
+
+## 📁 Структура проекта
+
+```
+vite-bootstrap/
+├── src/                      # Исходный код приложения
+│   ├── main.ts              # Главный файл с логикой приложения
+│   └── styles.scss          # Стили Bootstrap (импорты)
+├── docs/                     # Скомпилированное приложение для GitHub Pages
+├── index.html               # HTML-шаблон приложения
+├── package.json             # Зависимости и скрипты проекта
+├── tsconfig.json            # Конфигурация TypeScript
+├── vite.config.js           # Конфигурация Vite
+└── .gitignore               # Файлы, игнорируемые Git
+
+```
+
+---
+
+## ⚙️ Как работает проект
+
+### Этап 1: Конфигурация Vite (`vite.config.js`)
+
+```javascript
+import { defineConfig } from "vite";
+
+const repoName = "vite-bootstrap";
+
+export default defineConfig({
+  base: `/${repoName}/`,              // Базовый путь для GitHub Pages
+  build: {
+    outDir: "docs"                     // Папка для сборки (для GitHub Pages)
+  }
+});
+```
+
+**Что происходит:**
+- Настраивается базовый путь `/vite-bootstrap/` для работы на GitHub Pages
+- Указывается папка `docs` для сборки (GitHub Pages может публиковать из этой папки)
+
+---
+
+### Этап 2: HTML-шаблон (`index.html`)
+
+```html
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vite Bootstrap</title>
+  </head>
+  <body>
+    <!-- Контейнер с кнопкой -->
+    <div class="container-fluid">
+      <div class="row min-vh-100 align-items-center">
+        <div class="col-2"></div>
+        <div class="col-8">
+          <button id="showTimeBtn" class="btn btn-danger btn-lg w-100">
+            Показать время
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно для отображения времени -->
+    <div class="modal fade" id="timeModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Бореева Виолетта</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+            <h2 id="clock" class="mb-0">--.--.- --:--:--</h2>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal">
+              Закрыть
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Подключение главного скрипта -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+```
+
+**Что происходит:**
+- Определяется структура страницы с кнопкой и модальным окном
+- Используются классы Bootstrap для стилизации (`btn`, `modal`, и т.д.)
+- Подключается TypeScript файл `main.ts` как модуль
+
+---
+
+### Этап 3: Стили (`src/styles.scss`)
+
+```scss
+// Импортируем только необходимые части Bootstrap
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+
+// Базовые компоненты
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+
+// Компоненты, которые используются
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/close";
+
+// Утилиты
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/utilities/api";
+```
+
+**Что происходит:**
+- Импортируются только нужные компоненты Bootstrap (не весь фреймворк)
+- Это уменьшает размер финального CSS-файла
+- SCSS компилируется в обычный CSS при сборке
+
+---
+
+### Этап 4: Логика приложения (`src/main.ts`)
+
+#### 4.1. Импорты и инициализация
+
+```typescript
+import "./styles.scss";                 // Подключаем стили
+import { DateTime } from "luxon";       // Библиотека для работы с датой/временем
+
+const FORMAT = "dd.LL.y HH:mm:ss";      // Формат отображения времени
+```
+
+**Что происходит:**
+- Импортируются стили (Vite автоматически их обработает)
+- Импортируется библиотека Luxon для форматирования времени
+- Определяется формат времени: `день.месяц.год часы:минуты:секунды`
+
+#### 4.2. Получение элементов DOM
+
+```typescript
+const clockEl = document.getElementById("clock") as HTMLHeadingElement;
+const showTimeBtnEl = document.getElementById("showTimeBtn") as HTMLButtonElement;
+const timeModalEl = document.getElementById("timeModal") as HTMLElement;
+```
+
+**Что происходит:**
+- Получаем ссылки на HTML-элементы из DOM
+- TypeScript проверяет типы элементов для безопасности
+
+#### 4.3. Функция обновления времени
+
+```typescript
+function tick() {
+  const now = DateTime.now();                    // Получаем текущее время
+  clockEl.textContent = now.toFormat(FORMAT);    // Форматируем и отображаем
+}
+```
+
+**Что происходит:**
+- Функция `tick()` получает текущее время
+- Форматирует его в нужный вид (например: `11.01.2026 15:45:30`)
+- Обновляет текст в элементе часов
+
+#### 4.4. Показ модального окна
+
+```typescript
+function showModal() {
+  timeModalEl.classList.add("show");              // Добавляем класс видимости
+  timeModalEl.style.display = "block";            // Показываем элемент
+  document.body.classList.add("modal-open");      // Блокируем прокрутку страницы
+  
+  // Создаем затемнение фона
+  const backdrop = document.createElement("div");
+  backdrop.className = "modal-backdrop fade show";
+  backdrop.id = "modalBackdrop";
+  document.body.appendChild(backdrop);
+  
+  tick();                                         // Показываем время сразу
+  
+  // Запускаем обновление каждую секунду
+  if (intervalId === null) {
+    intervalId = window.setInterval(tick, 1000);
+  }
+}
+```
+
+**Что происходит:**
+1. Модальное окно становится видимым (добавляются CSS-классы)
+2. Создается темный фон (backdrop) позади модального окна
+3. Блокируется прокрутка страницы
+4. Сразу показывается текущее время
+5. Запускается таймер, который обновляет время каждую секунду
+
+#### 4.5. Скрытие модального окна
+
+```typescript
+function hideModal() {
+  timeModalEl.classList.remove("show");           // Убираем класс видимости
+  timeModalEl.style.display = "none";             // Скрываем элемент
+  document.body.classList.remove("modal-open");   // Разблокируем прокрутку
+  
+  // Удаляем затемнение фона
+  const backdrop = document.getElementById("modalBackdrop");
+  if (backdrop) {
+    backdrop.remove();
+  }
+  
+  // Останавливаем таймер обновления
+  if (intervalId !== null) {
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+}
+```
+
+**Что происходит:**
+1. Модальное окно скрывается
+2. Удаляется темный фон
+3. Разблокируется прокрутка страницы
+4. Останавливается таймер обновления времени (экономия ресурсов)
+
+#### 4.6. Обработка событий
+
+```typescript
+// Показать модальное окно при клике на кнопку
+showTimeBtnEl.addEventListener("click", showModal);
+
+// Закрыть через кнопки закрытия
+const closeBtns = timeModalEl.querySelectorAll("[data-bs-dismiss='modal']");
+closeBtns.forEach(btn => {
+  btn.addEventListener("click", hideModal);
+});
+
+// Закрыть при клике на затемненный фон
+document.addEventListener("click", (e) => {
+  const target = e.target as HTMLElement;
+  if (target.id === "modalBackdrop") {
+    hideModal();
+  }
+});
+```
+
+**Что происходит:**
+1. При клике на кнопку "Показать время" - открывается модальное окно
+2. При клике на кнопки с `data-bs-dismiss="modal"` - окно закрывается
+3. При клике на темный фон - окно также закрывается
+
+---
+
+### Этап 5: Конфигурация TypeScript (`tsconfig.json`)
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",              // Компилировать в ES2020
+    "module": "ESNext",              // Использовать ESM модули
+    "moduleResolution": "Bundler",   // Разрешение модулей для бандлера
+    "strict": true,                  // Строгая проверка типов
+    "skipLibCheck": true             // Пропустить проверку библиотек
+  },
+  "include": ["src"]                 // Компилировать файлы из src/
+}
+```
+
+**Что происходит:**
+- TypeScript компилирует `.ts` файлы в JavaScript
+- Включена строгая проверка типов для надежности кода
+- Используются современные возможности JavaScript (ES2020)
+
+---
+
+## 🚀 Установка и запуск
+
+### Шаг 1: Установка зависимостей
+
+```bash
+npm install
+```
+
+**Что происходит:**
+- Устанавливаются все библиотеки из `package.json`
+- Создается папка `node_modules/` с зависимостями
+- Генерируется `package-lock.json` для фиксации версий
+
+### Шаг 2: Запуск в режиме разработки
+
+```bash
+npm run dev
+```
+
+**Что происходит:**
+1. Запускается сервер разработки Vite (обычно на http://localhost:5173)
+2. Vite компилирует TypeScript и SCSS на лету
+3. При изменении файлов страница автоматически обновляется (Hot Module Replacement)
+4. Открывается браузер с приложением
+
+### Шаг 3: Просмотр в браузере
+
+После запуска откройте в браузере адрес, который покажет Vite (обычно `http://localhost:5173`)
+
+**Что вы увидите:**
+1. Страницу с красной кнопкой "Показать время"
+2. При клике на кнопку откроется модальное окно
+3. В окне будет отображаться текущее время, обновляющееся каждую секунду
+
+---
+
+## 📦 Сборка и деплой
+
+### Шаг 1: Сборка проекта
+
+```bash
+npm run build
+```
+
+**Что происходит:**
+1. Vite компилирует все файлы TypeScript в JavaScript
+2. SCSS компилируется в CSS
+3. Файлы минифицируются и оптимизируются
+4. Создается папка `docs/` с готовым приложением
+5. Все импорты и зависимости объединяются в несколько файлов
+
+**Структура `docs/`:**
+```
+docs/
+├── index.html           # Главный HTML с правильными путями
+└── assets/
+    ├── index-[hash].js  # Скомпилированный JavaScript
+    └── index-[hash].css # Скомпилированный CSS
+```
+
+### Шаг 2: Локальный просмотр собранной версии
+
+```bash
+npm run preview
+```
+
+**Что происходит:**
+- Запускается сервер на порту 5173
+- Показывает собранную версию из папки `docs/`
+- Можно проверить, как приложение будет работать в production
+
+### Шаг 3: Деплой на GitHub Pages
+
+```bash
+npm run deploy
+```
+
+**Что происходит:**
+1. Запускается `npm run build` (сборка проекта)
+2. Библиотека `gh-pages` берет папку `docs/`
+3. Загружает содержимое в ветку `gh-pages` на GitHub
+4. GitHub Pages автоматически публикует сайт
+
+**После деплоя сайт будет доступен по адресу:**
+```
+https://<ваш-username>.github.io/vite-bootstrap/
+```
+
+Например: `https://violett32.github.io/vite-bootstrap/`
+
+---
+
+## 🔄 Полный цикл работы приложения
+
+### 1. Пользователь открывает страницу
+
+```
+Браузер → index.html → загружает main.ts → загружает styles.scss
+```
+
+### 2. Пользователь нажимает кнопку "Показать время"
+
+```
+Клик на кнопку → showModal() → открывается модальное окно
+                              → запускается tick()
+                              → setInterval(tick, 1000)
+```
+
+### 3. Отображение и обновление времени
+
+```
+tick() → DateTime.now() → форматирование → обновление DOM
+   ↓
+через 1 секунду
+   ↓
+tick() → DateTime.now() → форматирование → обновление DOM
+   ↓
+... (цикл продолжается)
+```
+
+### 4. Пользователь закрывает модальное окно
+
+```
+Клик на закрытие → hideModal() → скрывается окно
+                               → clearInterval() (остановка таймера)
+                               → удаляется backdrop
+```
+
+---
+
+## 🛠️ Используемые технологии и их роль
+
+| Технология | Зачем используется | Что делает |
+|------------|-------------------|-----------|
+| **Vite** | Сборка и разработка | Быстрый dev-сервер, сборка production |
+| **TypeScript** | Типизация кода | Проверка типов, автодополнение, надежность |
+| **Bootstrap 5** | Стилизация | Готовые компоненты (кнопки, модальные окна) |
+| **Luxon** | Работа с временем | Форматирование даты и времени |
+| **SCSS** | Препроцессор CSS | Переменные, импорты, вложенность |
+| **gh-pages** | Деплой | Автоматическая публикация на GitHub Pages |
+
+---
+
+## 📝 Команды package.json
+
+```json
+"scripts": {
+  "dev": "vite",                              // Запуск dev-сервера
+  "build": "vite build",                      // Сборка для production
+  "preview": "vite preview --port 5173",      // Просмотр собранной версии
+  "deploy": "vite build && gh-pages -d docs"  // Сборка + деплой на GitHub Pages
+}
+```
+
+---
+
+## 🎓 Ключевые концепции проекта
+
+### 1. **Модульность**
+- Код разделен на логические части (стили, логика, HTML)
+- Каждый файл отвечает за свою задачу
+
+### 2. **Современный JavaScript/TypeScript**
+- Использование `import/export` (ES modules)
+- Строгая типизация с TypeScript
+- Современный синтаксис (стрелочные функции, const/let)
+
+### 3. **Оптимизация**
+- Импорт только нужных частей Bootstrap
+- Минификация и сжатие при сборке
+- Остановка таймера при закрытии модального окна
+
+### 4. **Пользовательский опыт**
+- Модальное окно с затемнением фона
+- Обновление времени в реальном времени
+- Несколько способов закрыть окно (кнопки, клик на фон)
+
+---
+
+## 🎯 Итоговая схема работы
+
+```
+┌──────────────────────────────────────────────────────┐
+│                   ПОЛЬЗОВАТЕЛЬ                        │
+└────────────┬─────────────────────────┬────────────────┘
+             │                         │
+             ▼                         ▼
+      Открывает сайт          Нажимает кнопку
+             │                         │
+             ▼                         ▼
+┌────────────────────┐      ┌──────────────────────┐
+│   index.html       │      │   showModal()        │
+│   загружается      │      │   вызывается         │
+└────────┬───────────┘      └──────────┬───────────┘
+         │                             │
+         ▼                             ▼
+┌────────────────────┐      ┌──────────────────────┐
+│   main.ts          │      │   Модальное окно     │
+│   выполняется      │      │   открывается        │
+└────────┬───────────┘      └──────────┬───────────┘
+         │                             │
+         ▼                             ▼
+┌────────────────────┐      ┌──────────────────────┐
+│   styles.scss      │      │   tick() каждую      │
+│   применяется      │      │   секунду            │
+└────────────────────┘      └──────────┬───────────┘
+                                       │
+                                       ▼
+                            ┌──────────────────────┐
+                            │   Luxon форматирует  │
+                            │   время              │
+                            └──────────┬───────────┘
+                                       │
+                                       ▼
+                            ┌──────────────────────┐
+                            │   DOM обновляется    │
+                            │   новым временем     │
+                            └──────────────────────┘
+```
+
+---
+
+## 🎉 Заключение
+
+Этот проект демонстрирует:
+- ✅ Работу с современными инструментами (Vite, TypeScript)
+- ✅ Использование популярных библиотек (Bootstrap, Luxon)
+- ✅ Управление DOM и событиями
+- ✅ Работу с таймерами и интервалами
+- ✅ Автоматизацию сборки и деплоя
+
+Проект прост, но содержит все ключевые элементы современной веб-разработки!
