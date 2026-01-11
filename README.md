@@ -74,15 +74,36 @@ export default defineConfig({
     <title>Vite Bootstrap</title>
   </head>
   <body>
-    <!-- Кнопка для показа времени -->
-    <button id="showTimeBtn" class="btn btn-danger btn-lg w-100">
-      Показать время
-    </button>
+    <!-- Контейнер с кнопкой -->
+    <div class="container-fluid">
+      <div class="row min-vh-100 align-items-center">
+        <div class="col-2"></div>
+        <div class="col-8">
+          <button id="showTimeBtn" class="btn btn-danger btn-lg w-100">
+            Показать время
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Модальное окно для отображения времени -->
-    <div class="modal fade" id="timeModal" ...>
-      <h5 class="modal-title">Бореева Виолетта</h5>
-      <h2 id="clock">--.--.- --:--:--</h2>
+    <div class="modal fade" id="timeModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Бореева Виолетта</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center">
+            <h2 id="clock" class="mb-0">--.--.- --:--:--</h2>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal">
+              Закрыть
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Подключение главного скрипта -->
@@ -104,10 +125,25 @@ export default defineConfig({
 // Импортируем только необходимые части Bootstrap
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
-// ... другие импорты
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
 
+// Базовые компоненты
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+
+// Компоненты, которые используются
 @import "bootstrap/scss/buttons";
 @import "bootstrap/scss/modal";
+@import "bootstrap/scss/close";
+
+// Утилиты
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/utilities/api";
 ```
 
 **Что происходит:**
@@ -352,8 +388,10 @@ npm run deploy
 
 **После деплоя сайт будет доступен по адресу:**
 ```
-https://violett32.github.io/vite-bootstrap/
+https://<ваш-username>.github.io/vite-bootstrap/
 ```
+
+Например: `https://violett32.github.io/vite-bootstrap/`
 
 ---
 
